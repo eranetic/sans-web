@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANS Creative — Event Ecosystem · Jogjakarta</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0909;
+  --surface:#131111;
+  --surface2:#1a1717;
+  --white:#f5f0eb;
+  --accent:#EB0303;
+  --accent-dim:rgba(235,3,3,.15);
+  --accent-glow:rgba(235,3,3,.25);
+  --border:rgba(245,240,235,.1);
+  --border2:rgba(245,240,235,.06);
+  --gray:#8a8178;
+  --gray2:#4a4644;
+  --green:#2d6b3a;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cur{position:fixed;width:10px;height:10px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:normal}
+#cur-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(235,3,3,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s}
+body.hov #cur{width:18px;height:18px}
+body.hov #cur-ring{width:60px;height:60px;border-color:var(--accent)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s .3s,pointer-events 0s .9s}
+#loader.done{opacity:0;pointer-events:none}
+.ld-logo{margin-bottom:32px;opacity:0;animation:fdIn .7s .3s forwards}
+.ld-bar-wrap{width:220px;height:1.5px;background:var(--border)}
+.ld-bar{height:100%;background:var(--accent);width:0;animation:ldBar 1.5s .5s ease forwards}
+@keyframes ldBar{to{width:100%}}
+@keyframes fdIn{to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:22px 56px;transition:background .5s,padding .4s,border .4s}
+nav.scrolled{background:rgba(10,9,9,.92);backdrop-filter:blur(24px);padding:14px 56px;border-bottom:1px solid var(--border2)}
+.nav-logo{cursor:pointer}
+.nav-links{display:flex;gap:4px;list-style:none}
+.nav-links a{font-family:'Syne',sans-serif;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);text-decoration:none;padding:8px 14px;transition:color .3s;position:relative;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-links a.active::after{content:'';position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.nav-cta{background:var(--accent)!important;color:var(--white)!important;padding:10px 22px!important;font-weight:700!important;transition:background .3s,transform .3s!important}
+.nav-cta:hover{background:#c80000!important;transform:translateY(-1px)!important}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* ── GLOBALS ── */
+.section-tag{font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:10px;margin-bottom:18px}
+.section-tag::before{content:'';width:24px;height:1.5px;background:var(--accent)}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(34px,5.2vw,68px);font-weight:800;line-height:.93;letter-spacing:-.025em;color:var(--white)}
+.section-title em{font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;color:var(--accent)}
+.section-sub{font-size:15px;line-height:1.75;color:var(--gray);max-width:500px;margin-top:18px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .85s ease,transform .85s ease}
+.rv.up{opacity:1;transform:translateY(0)}
+.rv-l{opacity:0;transform:translateX(-36px);transition:opacity .85s ease,transform .85s ease}
+.rv-l.up{opacity:1;transform:translateX(0)}
+.rv-r{opacity:0;transform:translateX(36px);transition:opacity .85s ease,transform .85s ease}
+.rv-r.up{opacity:1;transform:translateX(0)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:none;transition:all .3s ease}
+.btn-primary{background:var(--accent);color:var(--white);padding:16px 32px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.btn-primary:hover{background:#c80000;transform:translateY(-2px);box-shadow:0 12px 40px var(--accent-glow)}
+.btn-outline{background:transparent;color:var(--white);border:1px solid var(--border);padding:15px 31px}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-text{color:var(--accent);padding:0;gap:8px;background:transparent;border:none}
+.btn-text .arr{display:inline-block;transition:transform .3s}
+.btn-text:hover .arr{transform:translateX(6px)}
+.badge{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding:4px 10px}
+.badge-red{background:rgba(235,3,3,.12);color:var(--accent);border:1px solid rgba(235,3,3,.3)}
+.badge-green{background:rgba(45,107,58,.15);color:#5aad6a;border:1px solid rgba(45,107,58,.3)}
+.badge-blue{background:rgba(20,80,160,.15);color:#5090e0;border:1px solid rgba(20,80,160,.3)}
+
+/* MINI HERO (reusable for inner pages) */
+.mini-hero{padding:130px 56px 64px;background:var(--bg);position:relative;overflow:hidden;border-bottom:1px solid var(--border2)}
+.mini-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(235,3,3,.06) 0%,transparent 60%)}
+.mini-hero-num{font-family:'Syne',sans-serif;font-size:clamp(80px,14vw,180px);font-weight:800;color:rgba(245,240,235,.03);position:absolute;right:48px;top:50%;transform:translateY(-50%);letter-spacing:-.04em;line-height:1;pointer-events:none}
+
+/* ════════════════════════ PAGE HOME ════════════════════════ */
+
+/* HERO — VIDEO CINEMATIC */
+.hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.hero-video-wrap{position:absolute;inset:0;z-index:0}
+/* Cinematic CSS concert scene with layered animation */
+.hero-video-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,9,9,.65) 0%,rgba(10,9,9,.2) 40%,rgba(10,9,9,.75) 80%,rgba(10,9,9,1) 100%);z-index:2}
+.hero-video-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(10,9,9,.8) 0%,transparent 60%);z-index:2}
+.stage-scene{position:absolute;inset:0;z-index:1;overflow:hidden}
+/* Dark concert background */
+.stage-bg{position:absolute;inset:0;background:linear-gradient(180deg,#06050f 0%,#0c0814 30%,#080608 70%,#040304 100%)}
+/* Crowd silhouette layer */
+.crowd{position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top,#040304 0%,rgba(4,3,4,.8) 40%,transparent 100%);z-index:4}
+.crowd::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300'%3E%3Cellipse cx='100' cy='300' rx='40' ry='80' fill='%23050304'/%3E%3Cellipse cx='200' cy='290' rx='35' ry='70' fill='%23040303'/%3E%3Cellipse cx='300' cy='295' rx='42' ry='85' fill='%23050304'/%3E%3Cellipse cx='400' cy='285' rx='38' ry='75' fill='%23040303'/%3E%3Cellipse cx='500' cy='292' rx='40' ry='82' fill='%23060405'/%3E%3Cellipse cx='600' cy='288' rx='36' ry='72' fill='%23040303'/%3E%3Cellipse cx='700' cy='294' rx='41' ry='83' fill='%23050404'/%3E%3Cellipse cx='800' cy='286' rx='39' ry='77' fill='%23040303'/%3E%3Cellipse cx='900' cy='292' rx='43' ry='86' fill='%23060405'/%3E%3Cellipse cx='1000' cy='288' rx='37' ry='73' fill='%23040303'/%3E%3Cellipse cx='1100' cy='295' rx='40' ry='80' fill='%23050404'/%3E%3Cellipse cx='150' cy='300' rx='30' ry='60' fill='%23040303'/%3E%3Cellipse cx='350' cy='300' rx='28' ry='56' fill='%23050304'/%3E%3Cellipse cx='550' cy='300' rx='32' ry='64' fill='%23040303'/%3E%3Cellipse cx='750' cy='300' rx='29' ry='58' fill='%23050404'/%3E%3Cellipse cx='950' cy='300' rx='31' ry='62' fill='%23040303'/%3E%3Cellipse cx='1150' cy='300' rx='27' ry='54' fill='%23050304'/%3E%3C/svg%3E") bottom/cover no-repeat}
+/* Stage platform */
+.stage-platform{position:absolute;bottom:40%;left:50%;transform:translateX(-50%);width:500px;height:6px;background:linear-gradient(to right,transparent,rgba(235,3,3,.3),rgba(235,3,3,.6),rgba(235,3,3,.3),transparent);box-shadow:0 0 60px 10px rgba(235,3,3,.15);z-index:3;animation:stagePulse 4s ease-in-out infinite}
+@keyframes stagePulse{0%,100%{opacity:.7}50%{opacity:1}}
+/* Moving spotlights */
+.spot{position:absolute;top:0;width:0;height:0;z-index:3;transform-origin:top center}
+.spot::before{content:'';position:absolute;top:0;left:-60px;width:120px;height:55vh;clip-path:polygon(50% 0%,0% 100%,100% 100%);animation:spotMove 6s ease-in-out infinite}
+.spot-1{left:20%}.spot-1::before{background:linear-gradient(to bottom,rgba(235,3,3,.18),rgba(235,3,3,.02));animation-delay:0s}
+.spot-2{left:40%}.spot-2::before{background:linear-gradient(to bottom,rgba(255,120,0,.12),rgba(255,120,0,.01));animation-delay:-2s}
+.spot-3{left:60%}.spot-3::before{background:linear-gradient(to bottom,rgba(235,3,3,.18),rgba(235,3,3,.02));animation-delay:-4s}
+.spot-4{right:15%}.spot-4::before{background:linear-gradient(to bottom,rgba(200,0,200,.08),rgba(200,0,200,.01));animation-delay:-1s}
+@keyframes spotMove{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+/* Laser beams */
+.laser-wrap{position:absolute;bottom:40%;left:0;right:0;z-index:3}
+.laser{position:absolute;bottom:0;width:2px;height:0;transform-origin:bottom center;animation:laserShoot 3s ease-in-out infinite}
+.laser-1{left:30%;background:linear-gradient(to top,rgba(235,3,3,.8),transparent);animation-delay:0s;transform:rotate(-40deg)}
+.laser-2{left:50%;background:linear-gradient(to top,rgba(235,3,3,.8),transparent);animation-delay:.5s;transform:rotate(0deg)}
+.laser-3{right:30%;background:linear-gradient(to top,rgba(235,3,3,.8),transparent);animation-delay:1s;transform:rotate(40deg)}
+.laser-4{left:40%;background:linear-gradient(to top,rgba(255,100,0,.5),transparent);animation-delay:1.5s;transform:rotate(-20deg)}
+@keyframes laserShoot{0%,100%{height:0;opacity:0}20%,80%{height:45vh;opacity:1}50%{height:55vh}}
+/* Particle sparks */
+.sparks{position:absolute;inset:0;z-index:3;pointer-events:none}
+.spark{position:absolute;width:2px;height:2px;border-radius:50%;animation:sparkFly 4s ease-in-out infinite}
+@keyframes sparkFly{0%{opacity:0;transform:translate(0,0) scale(1)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0)}}
+.spark:nth-child(1){left:50%;bottom:40%;background:var(--accent);--dx:-80px;--dy:-120px;animation-delay:0s}
+.spark:nth-child(2){left:45%;bottom:40%;background:#ff6600;--dx:60px;--dy:-100px;animation-delay:.4s}
+.spark:nth-child(3){left:55%;bottom:40%;background:var(--accent);--dx:-40px;--dy:-140px;animation-delay:.8s}
+.spark:nth-child(4){left:48%;bottom:40%;background:#ffaa00;--dx:90px;--dy:-110px;animation-delay:1.2s}
+.spark:nth-child(5){left:52%;bottom:40%;background:var(--accent);--dx:-100px;--dy:-90px;animation-delay:1.6s}
+.spark:nth-child(6){left:50%;bottom:40%;background:#ff4400;--dx:50px;--dy:-130px;animation-delay:2s}
+/* Artist silhouette */
+.artist{position:absolute;bottom:41%;left:50%;transform:translateX(-50%);z-index:3;width:60px;height:100px;animation:artistMove 8s ease-in-out infinite}
+@keyframes artistMove{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.03)}}
+.artist-body{width:100%;height:100%;background:#030203;clip-path:polygon(40% 0%,60% 0%,65% 25%,80% 30%,75% 60%,60% 60%,60% 100%,40% 100%,40% 60%,25% 60%,20% 30%,35% 25%);filter:drop-shadow(0 0 20px rgba(235,3,3,.4))}
+/* Haze / fog */
+.haze{position:absolute;bottom:38%;left:0;right:0;height:80px;z-index:3;background:linear-gradient(to top,rgba(235,3,3,.04),transparent);animation:hazeFlow 5s ease-in-out infinite}
+@keyframes hazeFlow{0%,100%{opacity:.5;transform:scaleX(1)}50%{opacity:1;transform:scaleX(1.05)}}
+/* Screen glow backdrop */
+.screen-glow{position:absolute;top:5%;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse at center,rgba(235,3,3,.08) 0%,transparent 70%);z-index:2;animation:screenGlow 3s ease-in-out infinite}
+@keyframes screenGlow{0%,100%{opacity:.5}50%{opacity:1}}
+/* Stars in BG */
+.stars{position:absolute;top:0;left:0;right:0;height:50%;z-index:1}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.5}}
+
+.hero-content{position:relative;z-index:10;padding:0 56px 80px;max-width:700px}
+.hero-overline{display:inline-flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;animation:slideUp .8s .3s both}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse2 2s infinite}
+@keyframes pulse2{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
+.hero-title{font-family:'Syne',sans-serif;font-weight:700;font-size: clamp(34px, 6vw, 72px);line-height:.9;letter-spacing:-.03em;color:var(--white);margin-bottom:28px;animation:slideUp .8s .45s both}
+.hero-title em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;color:var(--accent)}
+.hero-sub{font-size:16px;line-height:1.75;color:rgba(245,240,235,.65);max-width:460px;margin-bottom:44px;animation:slideUp .8s .6s both}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;animation:slideUp .8s .75s both}
+.hero-stats{position:relative;z-index:10;display:flex;border-top:1px solid rgba(245,240,235,.08);animation:fadeIn 1s 1.2s both}
+.stat{flex:1;padding:24px 0 24px 48px;border-right:1px solid rgba(245,240,235,.06)}
+.stat:first-child{padding-left:56px}
+.stat:last-child{border-right:none}
+.stat-num{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.stat-num sup{font-size:16px;color:var(--accent)}
+.stat-label{font-size:11px;color:var(--gray);margin-top:2px;letter-spacing:.03em}
+
+/* HIGHLIGHTS */
+.highlights{padding:96px 56px;background:var(--surface)}
+.highlights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;background:var(--border2)}
+.hl-card{background:var(--surface);padding:36px 28px;position:relative;overflow:hidden;transition:background .4s}
+.hl-card:hover{background:var(--surface2)}
+.hl-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s}
+.hl-card:hover::before{transform:scaleX(1)}
+.hl-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:rgba(235,3,3,.08);position:absolute;top:16px;right:20px}
+/* SOLID SVG ICONS */
+.ico{width:40px;height:40px;margin-bottom:20px;display:flex;align-items:center;justify-content:center}
+.ico svg{width:28px;height:28px;fill:var(--accent)}
+.hl-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px}
+.hl-desc{font-size:13px;line-height:1.7;color:var(--gray)}
+
+/* FEATURED EVENTS */
+.home-events{padding:96px 56px;background:var(--bg)}
+.home-events-hd{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px}
+.events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.ev-card{background:var(--surface);overflow:hidden;cursor:pointer;transition:background .4s;position:relative}
+.ev-card:hover{background:var(--surface2)}
+.ev-img{height:220px;overflow:hidden;position:relative}
+.ev-img-inner{width:100%;height:100%;transition:transform .6s ease;position:relative}
+.ev-card:hover .ev-img-inner{transform:scale(1.06)}
+.ev-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,9,9,.95) 0%,rgba(10,9,9,.2) 100%)}
+.ev-img-tag{position:absolute;top:14px;left:14px;z-index:2}
+.ev-body{padding:22px 22px 26px}
+.ev-meta{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.ev-name{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--white);margin-bottom:8px;line-height:1.2}
+.ev-loc{font-size:12px;color:var(--gray);margin-bottom:18px;display:flex;align-items:center;gap:6px}
+.ev-loc svg{width:12px;height:12px;fill:var(--gray);flex-shrink:0}
+.ev-footer{display:flex;align-items:center;justify-content:space-between}
+
+/* event image placeholders - cinematic gradients + SVG pattern */
+.ev-festival{background:linear-gradient(160deg,#06091a 0%,#0d1530 50%,#08060f 100%)}
+.ev-indie{background:linear-gradient(160deg,#060d08 0%,#0a1810 50%,#050805 100%)}
+.ev-edm{background:linear-gradient(160deg,#120418 0%,#200630 50%,#0c0312 100%)}
+.ev-concert{background:linear-gradient(160deg,#1a0404 0%,#2e0808 40%,#0e0202 100%)}
+.ev-corp{background:linear-gradient(160deg,#0c0c10 0%,#181820 50%,#080808 100%)}
+.ev-outdoor{background:linear-gradient(160deg,#060e0a 0%,#0c1a10 50%,#040906 100%)}
+
+/* Real-looking event illustration (CSS art) */
+.ev-art{width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;position:relative}
+.ev-art-stage{width:200px;height:3px;background:linear-gradient(to right,transparent,rgba(235,3,3,.8),transparent);box-shadow:0 0 30px 4px rgba(235,3,3,.2);position:absolute;bottom:30%}
+.ev-art-spots{position:absolute;top:0;left:0;right:0;height:60%}
+.ev-spot{position:absolute;top:0;width:0;height:0}
+.ev-spot::after{content:'';position:absolute;top:0;left:-30px;width:60px;height:100%;clip-path:polygon(50% 0%,0% 100%,100% 100%)}
+.ev-s1{left:30%}.ev-s1::after{background:linear-gradient(to bottom,rgba(235,3,3,.3),transparent)}
+.ev-s2{left:50%}.ev-s2::after{background:linear-gradient(to bottom,rgba(255,150,0,.2),transparent)}
+.ev-s3{left:70%}.ev-s3::after{background:linear-gradient(to bottom,rgba(235,3,3,.3),transparent)}
+.ev-crowd-sil{position:absolute;bottom:28%;left:0;right:0;height:25%;background:linear-gradient(to top,rgba(10,9,9,.95),transparent)}
+
+/* Unsplash-style real photos via picsum with event context */
+.ev-photo{width:100%;height:100%;object-fit:cover;filter:brightness(.6) saturate(.8)}
+
+/* ECOSYSTEM */
+.ecosystem{padding:96px 56px;background:var(--surface)}
+.eco-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:56px}
+.eco-services{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px}
+.eco-svc{background:var(--surface2);padding:22px;border-left:2px solid transparent;transition:border-color .3s,background .3s}
+.eco-svc:hover{border-left-color:var(--accent);background:#1e1b18}
+.eco-svc-icon{width:28px;height:28px;margin-bottom:10px}
+.eco-svc-icon svg{width:100%;height:100%;fill:var(--accent)}
+.eco-svc-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px}
+.eco-svc-desc{font-size:11px;color:var(--gray);line-height:1.55}
+/* Orbit visual */
+.eco-visual{position:relative;height:480px}
+.eco-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:110px;height:110px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);z-index:2;background:var(--bg)}
+.eco-pulse-ring{position:absolute;left:50%;top:50%;border-radius:50%;border:1px solid rgba(235,3,3,.2);transform:translate(-50%,-50%);animation:orbPulse 2.5s ease-in-out infinite}
+.eco-pulse-ring:nth-child(1){width:150px;height:150px}
+.eco-pulse-ring:nth-child(2){width:150px;height:150px;animation-delay:.8s;border-color:rgba(235,3,3,.1)}
+@keyframes orbPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.5);opacity:0}}
+.eco-orbit{position:absolute;left:50%;top:50%;border:1px solid var(--border);border-radius:50%;animation:orb 22s linear infinite}
+.eco-orbit-1{width:240px;height:240px;margin:-120px 0 0 -120px}
+.eco-orbit-2{width:400px;height:400px;margin:-200px 0 0 -200px;animation-direction:reverse;animation-duration:32s}
+@keyframes orb{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.eco-node{position:absolute;width:46px;height:46px;background:var(--surface);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:counterOrb 22s linear infinite}
+.eco-orbit-2 .eco-node{animation-duration:32s;animation-direction:reverse}
+@keyframes counterOrb{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+.eco-node svg{width:18px;height:18px;fill:var(--gray);transition:fill .3s}
+.eco-node:hover svg{fill:var(--accent)}
+.eco-node:nth-child(1){top:-23px;left:50%;margin-left:-23px}
+.eco-node:nth-child(2){bottom:-23px;left:50%;margin-left:-23px}
+.eco-node:nth-child(3){top:50%;left:-23px;margin-top:-23px}
+.eco-node:nth-child(4){top:50%;right:-23px;margin-top:-23px}
+
+/* SOCIAL PROOF */
+.social-proof{padding:80px 56px;background:var(--bg);overflow:hidden}
+.logo-strip{overflow:hidden;margin:44px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:18px 0}
+.logo-track{display:flex;gap:64px;width:max-content;animation:logoScroll 22s linear infinite}
+.logo-item{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray2);white-space:nowrap}
+@keyframes logoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.testi{background:var(--surface);padding:30px 26px;position:relative}
+.testi-q{font-family:'Instrument Serif',serif;font-size:64px;color:rgba(235,3,3,.1);position:absolute;top:10px;left:18px;line-height:1}
+.testi-text{font-size:14px;line-height:1.75;color:var(--gray);margin-bottom:22px;position:relative;z-index:1}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white)}
+.testi-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white)}
+.testi-role{font-size:11px;color:var(--gray2)}
+
+/* MARQUEE CTA */
+.marquee-cta{padding:80px 56px;background:var(--surface);border-top:1px solid var(--border2);overflow:hidden}
+.mq-strip{overflow:hidden;margin-bottom:48px}
+.mq-inner{display:flex;gap:48px;width:max-content;animation:mq 18s linear infinite}
+.mq-item{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gray2);white-space:nowrap;display:flex;align-items:center;gap:20px}
+.mq-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-center{text-align:center}
+.mq-title{font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,52px);font-weight:800;letter-spacing:-.02em;color:var(--white);margin-bottom:28px}
+.mq-title em{font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;color:var(--accent)}
+
+/* ════════════════════════ PAGE ABOUT ════════════════════════ */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;padding:80px 56px 100px;background:var(--bg)}
+.about-visual-wrap{position:relative;height:480px}
+.about-img-a{position:absolute;right:0;top:0;width:78%;height:78%;background:linear-gradient(145deg,#1a0a0a,#2a1010,#0c0808);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.about-img-b{position:absolute;left:0;bottom:0;width:52%;height:52%;background:linear-gradient(145deg,#060c10,#0a1820,#040810);border:4px solid var(--bg);display:flex;align-items:center;justify-content:center}
+.about-img-line{position:absolute;right:-4px;bottom:28%;width:72px;height:3px;background:var(--accent)}
+.about-placeholder{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:rgba(245,240,235,.2)}
+
+.timeline-section{padding:96px 56px;background:var(--surface)}
+.timeline{position:relative;margin-top:56px;padding-left:40px}
+.timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:var(--border)}
+.tl-item{position:relative;padding:0 0 56px 48px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-19px;top:0;width:38px;height:38px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:1;transition:border-color .3s,background .3s}
+.tl-dot svg{width:16px;height:16px;fill:var(--gray);transition:fill .3s}
+.tl-item:hover .tl-dot{border-color:var(--accent);background:rgba(235,3,3,.08)}
+.tl-item:hover .tl-dot svg{fill:var(--accent)}
+.tl-year{font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.tl-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--white);margin-bottom:10px}
+.tl-desc{font-size:14px;line-height:1.75;color:var(--gray);max-width:540px}
+
+.values-section{padding:96px 56px;background:var(--bg)}
+.values-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-top:56px}
+.val-card{background:var(--surface);padding:44px 36px;position:relative;overflow:hidden;transition:background .4s}
+.val-card:hover{background:var(--surface2)}
+.val-bg{position:absolute;right:-12px;bottom:-24px;font-family:'Syne',sans-serif;font-size:110px;font-weight:800;color:rgba(245,240,235,.025);letter-spacing:-.05em}
+.val-icon{width:36px;height:36px;margin-bottom:22px}
+.val-icon svg{width:100%;height:100%;fill:var(--accent)}
+.val-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:12px}
+.val-desc{font-size:14px;line-height:1.75;color:var(--gray)}
+
+.team-section{padding:96px 56px;background:var(--surface)}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px}
+.team-card{background:var(--surface2);padding:36px 28px;transition:background .4s;cursor:default}
+.team-card:hover{background:#1e1b18}
+.team-av{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--white);margin-bottom:18px}
+.team-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:4px}
+.team-role{font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.team-bio{font-size:13px;line-height:1.65;color:var(--gray)}
+.about-cta{padding:80px 56px;background:var(--bg);text-align:center;border-top:1px solid var(--border2)}
+.about-cta h3{font-family:'Syne',sans-serif;font-size:clamp(24px,3.5vw,44px);font-weight:800;color:var(--white);margin-bottom:14px}
+.about-cta p{font-size:15px;color:var(--gray);max-width:400px;margin:0 auto 32px}
+
+/* ════════════════════════ PAGE EVENT ════════════════════════ */
+.event-filter-bar{background:var(--surface);padding:28px 56px;border-bottom:1px solid var(--border2);display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.filter-grp{display:flex;flex-direction:column;gap:7px;flex:1;min-width:140px}
+.filter-lbl{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gray)}
+.filter-select,.filter-input{background:var(--surface2);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:11px 14px;outline:none;transition:border-color .3s;-webkit-appearance:none}
+.filter-select:focus,.filter-input:focus{border-color:var(--accent)}
+.filter-input::placeholder{color:var(--gray2)}
+.filter-input{flex:1.8;min-width:200px}
+.filter-btn{background:var(--accent);color:var(--white);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;border:none;padding:0 28px;height:44px;cursor:pointer;transition:background .3s;align-self:flex-end;white-space:nowrap}
+.filter-btn:hover{background:#c80000}
+
+.listing-section{padding:60px 56px 100px;background:var(--bg)}
+.listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:48px}
+.lc{background:var(--surface);overflow:hidden;cursor:pointer;transition:background .4s;position:relative}
+.lc:hover{background:var(--surface2)}
+.lc-img{height:210px;overflow:hidden;position:relative}
+.lc-img-inner{width:100%;height:100%;transition:transform .6s ease}
+.lc:hover .lc-img-inner{transform:scale(1.06)}
+.lc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,9,9,.95) 0%,rgba(10,9,9,.1) 100%)}
+.lc-badge-wrap{position:absolute;top:12px;right:12px;z-index:2}
+.lc-tuktix{font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:.2em;background:rgba(10,9,9,.8);color:var(--accent);border:1px solid rgba(235,3,3,.4);padding:3px 8px;backdrop-filter:blur(4px)}
+.lc-body{padding:20px 20px 24px}
+.lc-date{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
+.lc-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);margin-bottom:6px;line-height:1.15}
+.lc-venue{font-size:12px;color:var(--gray);margin-bottom:18px;display:flex;align-items:center;gap:5px}
+.lc-venue svg{width:11px;height:11px;fill:var(--gray);flex-shrink:0}
+.lc-btns{display:flex;gap:8px}
+.lc-btn{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:9px 14px;border:none;cursor:pointer;transition:all .3s;flex:1;text-align:center}
+.lc-btn-p{background:var(--accent);color:var(--white)}
+.lc-btn-p:hover{background:#c80000}
+.lc-btn-o{background:transparent;border:1px solid var(--border);color:var(--white)}
+.lc-btn-o:hover{border-color:var(--accent);color:var(--accent)}
+
+.flow-section{padding:80px 56px;background:var(--surface)}
+.flow-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px}
+.flow-step{background:var(--surface2);padding:36px 28px;position:relative}
+.flow-num{font-family:'Syne',sans-serif;font-size:56px;font-weight:800;color:rgba(235,3,3,.1);line-height:1;margin-bottom:18px}
+.flow-icon{width:32px;height:32px;margin-bottom:16px}
+.flow-icon svg{width:100%;height:100%;fill:var(--accent)}
+.flow-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:10px}
+.flow-desc{font-size:13px;line-height:1.7;color:var(--gray)}
+.flow-arrow{position:absolute;right:20px;top:50%;transform:translateY(-50%);width:36px;height:1px;background:var(--border)}
+.flow-arrow::after{content:'';position:absolute;right:-1px;top:-3px;width:7px;height:7px;border-right:1.5px solid var(--border);border-top:1.5px solid var(--border);transform:rotate(45deg)}
+.flow-step:last-child .flow-arrow{display:none}
+
+/* ════════════════════════ PAGE SERVICE ════════════════════════ */
+.svc-blocks{padding:0 56px 100px;background:var(--bg)}
+.svc-block{display:grid;gap:80px;align-items:center;padding:80px 0;border-bottom:1px solid var(--border2)}
+.svc-block:nth-child(odd){grid-template-columns:1fr 1fr}
+.svc-block:nth-child(even){grid-template-columns:1fr 1fr}
+.svc-block:nth-child(even) .svc-content{order:2}
+.svc-block:nth-child(even) .svc-vis{order:1}
+.svc-block:last-child{border-bottom:none}
+.svc-tag-line{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.35em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.svc-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--white);margin-bottom:14px;line-height:1.1}
+.svc-desc{font-size:14px;line-height:1.75;color:var(--gray);margin-bottom:26px}
+.svc-feats{display:flex;flex-direction:column;gap:9px;margin-bottom:28px}
+.svc-feat{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--gray)}
+.svc-feat::before{content:'';width:18px;height:1px;flex-shrink:0;background:var(--accent)}
+.svc-vis{height:360px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.vis-tix{background:linear-gradient(135deg,#08140a,#0c1e10)}
+.vis-sys{background:linear-gradient(135deg,#080e14,#0c1420)}
+.vis-rent{background:linear-gradient(135deg,#14060a,#200810)}
+.vis-fin{background:linear-gradient(135deg,#0e0e06,#1a1a08)}
+/* QR */
+.qr-box{width:150px;height:150px;border:1.5px solid rgba(235,3,3,.5);position:relative;display:flex;align-items:center;justify-content:center}
+.qr-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--accent),transparent);animation:qrScan 1.8s ease-in-out infinite}
+@keyframes qrScan{0%{top:0}100%{top:100%}}
+.qr-c1{position:absolute;top:-2px;left:-2px;width:14px;height:14px;border-top:2.5px solid var(--accent);border-left:2.5px solid var(--accent)}
+.qr-c2{position:absolute;top:-2px;right:-2px;width:14px;height:14px;border-top:2.5px solid var(--accent);border-right:2.5px solid var(--accent)}
+.qr-c3{position:absolute;bottom:-2px;left:-2px;width:14px;height:14px;border-bottom:2.5px solid var(--accent);border-left:2.5px solid var(--accent)}
+.qr-c4{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-bottom:2.5px solid var(--accent);border-right:2.5px solid var(--accent)}
+.qr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:14px}
+.qr-cell{width:10px;height:10px;background:rgba(235,3,3,var(--op,.4))}
+/* Rundown vis */
+.rundown-rows{display:flex;flex-direction:column;gap:10px;padding:32px;width:100%}
+.rd-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(245,240,235,.03)}
+.rd-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rd-time{font-family:'Syne',sans-serif;font-size:11px;color:var(--gray);width:60px;flex-shrink:0}
+.rd-label{font-family:'Syne',sans-serif;font-size:12px;color:var(--white);flex:1}
+.rd-status{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.15em}
+/* Equipment grid */
+.equip-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:24px;width:100%}
+.equip-item{background:rgba(245,240,235,.04);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.equip-item svg{width:28px;height:28px;fill:var(--accent)}
+.equip-lbl{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gray)}
+/* Finance vis */
+.fin-display{padding:32px;width:100%}
+.fin-label{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);margin-bottom:12px}
+.fin-bar-wrap{height:4px;background:var(--border);margin-bottom:8px}
+.fin-bar-fill{height:100%;background:linear-gradient(to right,#8b0000,var(--accent));width:70%;animation:finGrow 2s ease forwards}
+@keyframes finGrow{from{width:0}to{width:70%}}
+.fin-amount{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--white);margin-top:16px}
+.fin-note{font-size:12px;color:var(--gray);margin-top:6px}
+
+/* PACKAGES */
+.packages-section{padding:80px 56px 96px;background:var(--surface)}
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px}
+.pkg{background:var(--surface2);padding:36px 28px;position:relative;overflow:hidden;transition:background .4s}
+.pkg:hover{background:#1e1b18}
+.pkg.featured{background:var(--accent)}
+.pkg.featured *:not(.btn){color:var(--bg)!important}
+.pkg-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px}
+.pkg-desc{font-size:13px;line-height:1.6;margin-bottom:24px}
+.pkg-price{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--accent);margin-bottom:28px;letter-spacing:-.02em}
+.pkg.featured .pkg-price{color:var(--bg)!important}
+.pkg-price span{font-size:13px;font-weight:400;color:var(--gray)}
+.pkg.featured .pkg-price span{color:rgba(10,9,9,.6)!important}
+.pkg-feats{display:flex;flex-direction:column;gap:11px;margin-bottom:28px}
+.pkg-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px}
+.pkg-feat svg{width:14px;height:14px;flex-shrink:0;margin-top:2px}
+.pkg-feat svg{fill:var(--accent)}
+.pkg.featured .pkg-feat svg{fill:var(--bg)!important}
+
+.svc-cta{padding:96px 56px;background:var(--bg);text-align:center}
+.svc-cta h2{font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,52px);font-weight:800;letter-spacing:-.02em;color:var(--white);max-width:620px;margin:0 auto 14px}
+.svc-cta h2 em{font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;color:var(--accent)}
+.svc-cta p{font-size:15px;color:var(--gray);max-width:420px;margin:0 auto 36px}
+
+/* ════════════════════════ PAGE SHOP ════════════════════════ */
+.shop-intro{padding:80px 56px 100px;background:var(--bg)}
+.shop-hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:80px}
+.shop-big-title{font-family:'Syne',sans-serif;font-size:clamp(56px,9vw,120px);font-weight:800;letter-spacing:-.04em;color:var(--white);line-height:.88}
+.shop-big-title em{font-family:'Instrument Serif',serif;font-weight:400;font-style:italic;color:var(--accent)}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.sc{background:var(--surface);overflow:hidden;cursor:pointer;transition:background .4s}
+.sc:hover{background:var(--surface2)}
+.sc-img{height:280px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.sc-img-bg{width:100%;height:100%;transition:transform .6s ease;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.sc:hover .sc-img-bg{transform:scale(1.04)}
+.sc-ico{width:64px;height:64px}
+.sc-ico svg{width:100%;height:100%;fill:rgba(235,3,3,.25)}
+.sc-bg-txt{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(245,240,235,.12)}
+.sc-body{padding:22px 22px 26px}
+.sc-tag{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+.sc-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--white);margin-bottom:16px}
+.sc-bot{display:flex;align-items:center;justify-content:space-between}
+.sc-price{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--accent)}
+.sc-add{background:var(--accent);color:var(--white);border:none;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:9px 16px;cursor:pointer;transition:all .3s}
+.sc-add:hover{background:#c80000;transform:translateY(-2px)}
+.sc-add.added{background:var(--green)}
+.brand-story{padding:96px 56px;background:var(--surface)}
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.brand-quote{font-family:'Instrument Serif',serif;font-size:clamp(22px,3.2vw,38px);font-style:italic;line-height:1.3;color:var(--white);border-left:3px solid var(--accent);padding-left:28px}
+.brand-txt{font-size:14px;line-height:1.8;color:var(--gray)}
+.brand-txt p+p{margin-top:16px}
+
+/* ════════════════ FOOTER ════════════════ */
+footer{background:#070606;padding:56px 56px 36px;border-top:1px solid var(--border2)}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:56px;margin-bottom:44px}
+.ft-tagline{font-size:13px;color:var(--gray);line-height:1.7;margin:14px 0 26px}
+.ft-socials{display:flex;gap:8px}
+.ft-soc{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;transition:border-color .3s}
+.ft-soc svg{width:15px;height:15px;fill:var(--gray);transition:fill .3s}
+.ft-soc:hover{border-color:var(--accent)}
+.ft-soc:hover svg{fill:var(--accent)}
+.ft-col-title{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.ft-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.ft-links a{font-size:13px;color:var(--gray);text-decoration:none;cursor:pointer;transition:color .3s}
+.ft-links a:hover{color:var(--white)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid var(--border2)}
+.ft-copy{font-family:'Syne',sans-serif;font-size:11px;color:var(--gray2);letter-spacing:.04em}
+.ft-tagk{font-family:'Syne',sans-serif;font-size:11px;color:var(--gray2)}
+.ft-tagk strong{color:var(--accent)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:800;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(10px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);max-width:500px;width:100%;padding:44px;position:relative;border-top:2px solid var(--accent);animation:modalIn .4s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-x{position:absolute;top:14px;right:14px;width:30px;height:30px;border:1px solid var(--border);background:transparent;color:var(--gray);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s}
+.modal-x:hover{border-color:var(--accent);color:var(--accent)}
+.modal-tag-line{font-family:'Syne',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.modal-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--gray);margin-bottom:28px}
+.modal-inp{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:12px 15px;outline:none;transition:border-color .3s;margin-bottom:12px}
+.modal-inp::placeholder{color:var(--gray2)}
+.modal-inp:focus{border-color:var(--accent)}
+.modal-footer-note{text-align:center;margin-top:14px;font-size:11px;color:var(--gray)}
+.modal-footer-note strong{color:var(--accent)}
+
+/* NOISE */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9990;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");opacity:.35}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3170.71 818.36" height="34" style="fill:#f5f0eb"><path d="M874.51 654.98c-33.09,0 -60.06,26.97 -60.06,60.06l0 43.26c0,33.16 26.97,60.06 60.06,60.06 33.16,0 60.06,-26.9 60.06,-60.06l0 -2.51 -23.95 0 0 2.51c0,19.9 -16.21,36.11 -36.11,36.11 -19.9,0 -36.11,-16.21 -36.11,-36.11l0 -43.26c0,-19.9 16.21,-36.04 36.11,-36.04 19.9,0 36.11,16.14 36.11,36.04l0 2.36 23.95 0 0 -2.36c0,-33.09 -26.9,-60.06 -60.06,-60.06zm253.43 106.78c3.09,-2.06 5.9,-4.42 8.55,-6.85 9.51,-9.66 15.4,-22.92 15.4,-37.51l0 -9.66c0,-0.15 0,-0.29 0,-0.59 -0.15,-12.01 -3.54,-23.07 -9.51,-31.76 -1.18,-1.69 -2.43,-3.39 -3.83,-5.01 -2.21,-2.58 -4.72,-4.79 -7.37,-6.78 -1.03,-0.96 -2.14,-1.62 -3.24,-2.36 -6.56,-4.05 -13.85,-6.26 -21.59,-6.26l-74.5 0 0 163.38 23.95 0 0 -48.05 36.55 0 33.9 48.05 29.4 0 -36.55 -51.96c3.09,-1.25 6.04,-2.8 8.84,-4.64zm-28.74 -15.4l-43.4 0 0 -67.36 43.4 0c7.89,0 15.04,3.24 20.34,8.4 5.16,5.23 8.4,12.38 8.4,20.34l0 9.66c0,7.96 -3.24,15.25 -8.4,20.41 -4.05,3.98 -9.14,6.78 -15.11,7.89 -1.69,0.29 -3.54,0.66 -5.23,0.66zm156.82 72l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38zm270.97 -163.38c-33.09,0 -59.99,26.97 -59.99,60.06l0 103.32 23.95 0 0 -43.26 72.15 0 0 43.26 23.95 0 0 -43.26 0 -24.1 0 -35.96c0,-33.09 -26.9,-60.06 -60.06,-60.06zm36.11 96.02l-72.15 0 0 -35.96c0,-19.9 16.14,-36.04 36.04,-36.04 9.95,0 19.01,3.98 25.57,10.54 6.48,6.56 10.54,15.55 10.54,25.5l0 35.96zm194.84 -96.02l-72.07 0 0 24.02 48.12 0 0 139.35 23.95 0 0 -139.35 48.05 0 0 -24.02 -48.05 0zm146.94 163.38l23.95 0 0 -163.38 -23.95 0 0 163.38zm182.32 -31.25l-39.2 -132.13 -25.05 0 48.41 163.38 31.54 0 48.56 -163.38 -25.2 0 -39.06 132.13zm158.44 31.25l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38z"/><path d="M2581.68 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.27,61.02 61.02,61.02l417.4 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.93,171.48 -171.63,171.48l-588.96 0 0 -110.47 588.96 0c33.67,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.4 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm-2410.12 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.26,61.02 61.02,61.02l417.39 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.94,171.48 -171.63,171.48l-588.95 0 0 -110.47 588.95 0c33.68,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.39 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm1227.13 110.54l-31.47 0c-20.27,0 -39.43,7.37 -54.02,20.12l-444.88 445.03 -156.3 0 525.58 -525.65c35.96,-32.5 81.8,-50.04 129.62,-50.04l142.08 0 0 575.69 -110.61 0 0 -465.15zm314.82 43.48l0 421.67 -110.47 0 0 -575.69 93.51 0 532.21 421.67 0 -421.67 110.54 0 0 575.69 -93.59 0 -532.21 -421.67z"/></svg></div>
+  <div class="ld-bar-wrap"><div class="ld-bar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo" onclick="showPage('home')">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3170.71 818.36" height="24" style="fill:#f5f0eb"><path d="M874.51 654.98c-33.09,0 -60.06,26.97 -60.06,60.06l0 43.26c0,33.16 26.97,60.06 60.06,60.06 33.16,0 60.06,-26.9 60.06,-60.06l0 -2.51 -23.95 0 0 2.51c0,19.9 -16.21,36.11 -36.11,36.11 -19.9,0 -36.11,-16.21 -36.11,-36.11l0 -43.26c0,-19.9 16.21,-36.04 36.11,-36.04 19.9,0 36.11,16.14 36.11,36.04l0 2.36 23.95 0 0 -2.36c0,-33.09 -26.9,-60.06 -60.06,-60.06zm253.43 106.78c3.09,-2.06 5.9,-4.42 8.55,-6.85 9.51,-9.66 15.4,-22.92 15.4,-37.51l0 -9.66c0,-0.15 0,-0.29 0,-0.59 -0.15,-12.01 -3.54,-23.07 -9.51,-31.76 -1.18,-1.69 -2.43,-3.39 -3.83,-5.01 -2.21,-2.58 -4.72,-4.79 -7.37,-6.78 -1.03,-0.96 -2.14,-1.62 -3.24,-2.36 -6.56,-4.05 -13.85,-6.26 -21.59,-6.26l-74.5 0 0 163.38 23.95 0 0 -48.05 36.55 0 33.9 48.05 29.4 0 -36.55 -51.96c3.09,-1.25 6.04,-2.8 8.84,-4.64zm-28.74 -15.4l-43.4 0 0 -67.36 43.4 0c7.89,0 15.04,3.24 20.34,8.4 5.16,5.23 8.4,12.38 8.4,20.34l0 9.66c0,7.96 -3.24,15.25 -8.4,20.41 -4.05,3.98 -9.14,6.78 -15.11,7.89 -1.69,0.29 -3.54,0.66 -5.23,0.66zm156.82 72l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38zm270.97 -163.38c-33.09,0 -59.99,26.97 -59.99,60.06l0 103.32 23.95 0 0 -43.26 72.15 0 0 43.26 23.95 0 0 -43.26 0 -24.1 0 -35.96c0,-33.09 -26.9,-60.06 -60.06,-60.06zm36.11 96.02l-72.15 0 0 -35.96c0,-19.9 16.14,-36.04 36.04,-36.04 9.95,0 19.01,3.98 25.57,10.54 6.48,6.56 10.54,15.55 10.54,25.5l0 35.96zm194.84 -96.02l-72.07 0 0 24.02 48.12 0 0 139.35 23.95 0 0 -139.35 48.05 0 0 -24.02 -48.05 0zm146.94 163.38l23.95 0 0 -163.38 -23.95 0 0 163.38zm182.32 -31.25l-39.2 -132.13 -25.05 0 48.41 163.38 31.54 0 48.56 -163.38 -25.2 0 -39.06 132.13zm158.44 31.25l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38z"/><path d="M2581.68 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.27,61.02 61.02,61.02l417.4 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.93,171.48 -171.63,171.48l-588.96 0 0 -110.47 588.96 0c33.67,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.4 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm-2410.12 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.26,61.02 61.02,61.02l417.39 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.94,171.48 -171.63,171.48l-588.95 0 0 -110.47 588.95 0c33.68,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.39 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm1227.13 110.54l-31.47 0c-20.27,0 -39.43,7.37 -54.02,20.12l-444.88 445.03 -156.3 0 525.58 -525.65c35.96,-32.5 81.8,-50.04 129.62,-50.04l142.08 0 0 575.69 -110.61 0 0 -465.15zm314.82 43.48l0 421.67 -110.47 0 0 -575.69 93.51 0 532.21 421.67 0 -421.67 110.54 0 0 575.69 -93.59 0 -532.21 -421.67z"/></svg>
+  </div>
+  <ul class="nav-links">
+    <li><a id="nav-home" class="active" onclick="showPage('home')">Home</a></li>
+    <li><a id="nav-about" onclick="showPage('about')">About</a></li>
+    <li><a id="nav-event" onclick="showPage('event')">Events</a></li>
+    <li><a id="nav-service" onclick="showPage('service')">Services</a></li>
+    <li><a id="nav-shop" onclick="showPage('shop')">Shop</a></li>
+    <li><a class="nav-cta" onclick="openModal('Plan an Event','','','')">Plan an Event</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════ PAGE: HOME ══════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-video-wrap">
+      <div class="stage-scene">
+        <div class="stage-bg"></div>
+        <!-- Stars -->
+        <div class="stars" id="stars"></div>
+        <!-- Spotlights -->
+        <div class="spot spot-1"></div>
+        <div class="spot spot-2"></div>
+        <div class="spot spot-3"></div>
+        <div class="spot spot-4"></div>
+        <!-- Screen glow -->
+        <div class="screen-glow"></div>
+        <!-- Lasers -->
+        <div class="laser-wrap">
+          <div class="laser laser-1"></div>
+          <div class="laser laser-2"></div>
+          <div class="laser laser-3"></div>
+          <div class="laser laser-4"></div>
+        </div>
+        <!-- Sparks -->
+        <div class="sparks">
+          <div class="spark"></div><div class="spark"></div><div class="spark"></div>
+          <div class="spark"></div><div class="spark"></div><div class="spark"></div>
+        </div>
+        <!-- Stage platform -->
+        <div class="stage-platform"></div>
+        <!-- Artist silhouette -->
+        <div class="artist"><div class="artist-body"></div></div>
+        <!-- Haze -->
+        <div class="haze"></div>
+        <!-- Crowd -->
+        <div class="crowd"></div>
+      </div>
+    </div>
+    <div class="hero-content">
+      <br>
+      <br>
+      <h1 class="hero-title">We Build Crowds.<br>We Build <em>Moments.</em></h1>
+      <p class="hero-sub">Music events, brand activations, community shows—SANS Creative runs it end-to-end dengan ekosistem event yang paling lengkap.</p>
+      <div class="hero-btns">
+        <a class="btn btn-primary" onclick="showPage('event')">Plan an Event ↗</a>
+        <a class="btn btn-outline" onclick="showPage('event')">Explore Events</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="cnt1">200<sup>+</sup></div><div class="stat-label">Events Produced</div></div>
+      <div class="stat"><div class="stat-num" id="cnt2">50<sup>K+</sup></div><div class="stat-label">Audience Reached</div></div>
+      <div class="stat"><div class="stat-num" id="cnt3">6<sup>+</sup></div><div class="stat-label">Tahun Berpengalaman</div></div>
+      <div class="stat"><div class="stat-num" id="cnt4">98<sup>%</sup></div><div class="stat-label">Client Satisfaction</div></div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section class="highlights">
+    <div class="section-tag">Kenapa SANS</div>
+    <h2 class="section-title">Satu Tim.<br><em>Semua Tertangani.</em></h2>
+    <div class="highlights-grid">
+      <div class="hl-card rv"><div class="hl-num">01</div>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-3c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg></div>
+        <div class="hl-title">Music Event Specialist</div>
+        <div class="hl-desc">Dari indie night hingga festival besar, kami memahami crowd musik, kebutuhan artis, dan energi panggung di setiap skala.</div>
+      </div>
+      <div class="hl-card rv" style="transition-delay:.1s"><div class="hl-num">02</div>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        <div class="hl-title">All-in Event Ecosystem</div>
+        <div class="hl-desc">Ticketing, equipment, venue, crew, financing—setiap elemen event dikoordinasi dalam satu sistem terintegrasi.</div>
+      </div>
+      <div class="hl-card rv" style="transition-delay:.2s"><div class="hl-num">03</div>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M20 12V22H4V12M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
+        <div class="hl-title">Tuktix — Anak Platform SANS</div>
+        <div class="hl-desc">QR ticketing real-time, gate scanning, dan live sales dashboard. Tuktix dibangun oleh SANS untuk event SANS dan klien kami.</div>
+      </div>
+      <div class="hl-card rv" style="transition-delay:.3s"><div class="hl-num">04</div>
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        <div class="hl-title">Operationally Precise</div>
+        <div class="hl-desc">Data-driven rundown, manajemen crew, incident logging, dan post-event reporting yang menjadi standar industri.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED EVENTS -->
+  <section class="home-events">
+    <div class="home-events-hd rv">
+      <div><div class="section-tag">Featured Events</div><h2 class="section-title">Upcoming <em>Shows</em></h2></div>
+      <a class="btn btn-text" onclick="showPage('event')">All Events 20+ <span class="arr">→</span></a>
+    </div>
+    <div class="events-grid">
+      <div class="ev-card rv" onclick="openModal('Synchronize Festival 2025','Aug 15, 2025','JIEXPO Kemayoran, Jogjakarta','Festival')">
+        <div class="ev-img"><div class="ev-img-inner ev-festival" style="height:100%">
+          <div style="width:100%;height:100%;display:flex;align-items:flex-end;padding:16px;position:relative">
+            <div class="ev-img-overlay"></div>
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden">
+              <div style="position:absolute;top:0;left:25%;width:0;height:0"><div style="position:absolute;left:-50px;width:100px;height:100%;background:linear-gradient(to bottom,rgba(235,3,3,.25),transparent);clip-path:polygon(50% 0%,0% 100%,100% 100%)"></div></div>
+              <div style="position:absolute;top:0;left:55%;width:0;height:0"><div style="position:absolute;left:-40px;width:80px;height:100%;background:linear-gradient(to bottom,rgba(255,130,0,.15),transparent);clip-path:polygon(50% 0%,0% 100%,100% 100%)"></div></div>
+              <div style="position:absolute;bottom:30%;left:0;right:0;height:3px;background:linear-gradient(to right,transparent,rgba(235,3,3,.7),transparent);box-shadow:0 0 20px 2px rgba(235,3,3,.15)"></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-red">Festival</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Aug 15, 2025</div>
+          <div class="ev-name">Synchronize Festival 2025</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>JIEXPO Kemayoran, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+      <div class="ev-card rv" style="transition-delay:.1s" onclick="openModal('Indie Night Vol. 12','Sep 5, 2025','Kota Baru Musik, Jogjakarta','Indie Night')">
+        <div class="ev-img"><div class="ev-img-inner ev-indie" style="height:100%">
+          <div style="width:100%;height:100%;position:relative">
+            <div class="ev-img-overlay"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding-bottom:30%">
+              <div style="display:flex;gap:4px;align-items:flex-end">
+                <div style="width:3px;height:40px;background:rgba(235,3,3,.5);border-radius:2px"></div>
+                <div style="width:3px;height:28px;background:rgba(235,3,3,.3);border-radius:2px"></div>
+                <div style="width:3px;height:52px;background:rgba(235,3,3,.6);border-radius:2px"></div>
+                <div style="width:3px;height:35px;background:rgba(235,3,3,.4);border-radius:2px"></div>
+                <div style="width:3px;height:44px;background:rgba(235,3,3,.5);border-radius:2px"></div>
+                <div style="width:3px;height:22px;background:rgba(235,3,3,.3);border-radius:2px"></div>
+                <div style="width:3px;height:48px;background:rgba(235,3,3,.5);border-radius:2px"></div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-blue">Indie Night</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Sep 5, 2025</div>
+          <div class="ev-name">Indie Night Vol. 12</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Kota Baru Musik, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+      <div class="ev-card rv" style="transition-delay:.2s" onclick="openModal('Electric Ground Jogja','Oct 18, 2025','GOR Among Rogo, Jogjakarta','EDM')">
+        <div class="ev-img"><div class="ev-img-inner ev-edm" style="height:100%">
+          <div style="width:100%;height:100%;position:relative">
+            <div class="ev-img-overlay"></div>
+            <div style="position:absolute;inset:0;overflow:hidden">
+              <div style="position:absolute;top:0;left:30%;width:1px;height:55%;background:linear-gradient(to bottom,rgba(235,3,3,.9),transparent);animation:laserShoot 2s .3s ease-in-out infinite"></div>
+              <div style="position:absolute;top:0;left:50%;width:1px;height:65%;background:linear-gradient(to bottom,rgba(235,3,3,.9),transparent);animation:laserShoot 2s ease-in-out infinite"></div>
+              <div style="position:absolute;top:0;right:30%;width:1px;height:50%;background:linear-gradient(to bottom,rgba(235,3,3,.9),transparent);animation:laserShoot 2s .6s ease-in-out infinite"></div>
+              <div style="position:absolute;bottom:30%;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(235,3,3,.5),transparent)"></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-red">EDM</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Oct 18, 2025</div>
+          <div class="ev-name">Electric Ground Jogja</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>GOR Among Rogo, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+      <div class="ev-card rv" onclick="openModal('Brand Activation Summit','Nov 3, 2025','Royal Ambarrukmo Hotel, Jogjakarta','Corporate')">
+        <div class="ev-img"><div class="ev-img-inner ev-corp" style="height:100%">
+          <div style="width:100%;height:100%;position:relative;display:flex;align-items:center;justify-content:center">
+            <div class="ev-img-overlay"></div>
+            <div style="position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:20px;opacity:.25">
+              <div style="height:60px;background:rgba(235,3,3,.8)"></div><div style="height:60px;background:rgba(235,3,3,.4)"></div><div style="height:60px;background:rgba(235,3,3,.6)"></div><div style="height:60px;background:rgba(235,3,3,.2)"></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-red">Corporate</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Nov 3, 2025</div>
+          <div class="ev-name">Brand Activation Summit</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Royal Ambarrukmo, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+      <div class="ev-card rv" style="transition-delay:.1s" onclick="openModal('SANS Outdoor Fest','Dec 20, 2025','Pantai Parangtritis, Jogjakarta','Festival')">
+        <div class="ev-img"><div class="ev-img-inner ev-outdoor" style="height:100%">
+          <div style="width:100%;height:100%;position:relative">
+            <div class="ev-img-overlay"></div>
+            <div style="position:absolute;inset:0;overflow:hidden">
+              <div style="position:absolute;bottom:28%;left:0;right:0;height:60px;background:linear-gradient(to top,rgba(0,40,0,.5),transparent)"></div>
+              <div style="position:absolute;top:20%;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(235,3,3,.3),transparent)"></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-red">Festival</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Dec 20, 2025</div>
+          <div class="ev-name">SANS Outdoor Fest</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Pantai Parangtritis, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+      <div class="ev-card rv" style="transition-delay:.2s" onclick="openModal('Community Sounds #7','Jan 10, 2026','Lapangan GBK Jogja','Community')">
+        <div class="ev-img"><div class="ev-img-inner ev-concert" style="height:100%">
+          <div style="width:100%;height:100%;position:relative">
+            <div class="ev-img-overlay"></div>
+            <div style="position:absolute;inset:0;overflow:hidden">
+              <div style="position:absolute;top:0;left:40%;width:0;height:0"><div style="position:absolute;left:-50px;width:100px;height:90%;background:linear-gradient(to bottom,rgba(235,3,3,.3),transparent);clip-path:polygon(50% 0%,0% 100%,100% 100%)"></div></div>
+              <div style="position:absolute;bottom:30%;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(235,3,3,.6),transparent);box-shadow:0 0 15px 2px rgba(235,3,3,.1)"></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="ev-img-tag"><span class="badge badge-blue">Community</span></div>
+        <div class="ev-body">
+          <div class="ev-meta">Jan 10, 2026</div>
+          <div class="ev-name">Community Sounds #7</div>
+          <div class="ev-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Lapangan GBK, Jogjakarta</div>
+          <div class="ev-footer"><span class="badge badge-green">Ticket by Tuktix</span><a class="btn btn-text" style="font-size:11px">Beli Tiket <span class="arr">→</span></a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECOSYSTEM -->
+  <section class="ecosystem">
+    <div class="eco-grid">
+      <div>
+        <div class="section-tag rv">Ekosistem SANS</div>
+        <h2 class="section-title rv">Semua<br><em>Terhubung.</em></h2>
+        <p class="section-sub rv">SANS Creative adalah induk dari semua bisnis event ini. Enam pilar layanan berjalan sebagai satu operasi mulus—tidak perlu berurusan dengan vendor yang terfragmentasi.</p>
+        <div class="eco-services rv">
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M20 12V22H4V12M22 7H2v5h20V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div><div class="eco-svc-title">Tuktix Ticketing</div><div class="eco-svc-desc">Platform anak SANS: QR ticket, gate scan, realtime dashboard</div></div>
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="eco-svc-title">Event Management</div><div class="eco-svc-desc">Crew roles, rundown, vendor list, incident log</div></div>
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div class="eco-svc-title">Equipment Rental</div><div class="eco-svc-desc">Sound, lighting, LED, stage, barrier & wristband</div></div>
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="eco-svc-title">Event Financing</div><div class="eco-svc-desc">Staged cashflow bridge & vendor payout scheduling</div></div>
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="eco-svc-title">Talent & Crew</div><div class="eco-svc-desc">Artist booking, technical crew, keamanan & hospitality</div></div>
+          <div class="eco-svc"><div class="eco-svc-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="eco-svc-title">Venue & Permit</div><div class="eco-svc-desc">Location scouting, pengurusan izin & compliance</div></div>
+        </div>
+      </div>
+      <div class="eco-visual rv-r">
+        <div class="eco-pulse-ring"></div>
+        <div class="eco-pulse-ring"></div>
+        <div class="eco-center">SANS<br>CREATIVE</div>
+        <div class="eco-orbit eco-orbit-1">
+          <div class="eco-node"><svg viewBox="0 0 24 24"><path d="M20 12V22H4V12M22 7H2v5h20V7z"/></svg></div>
+          <div class="eco-node"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div>
+          <div class="eco-node"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="eco-node"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/></svg></div>
+        </div>
+        <div class="eco-orbit eco-orbit-2">
+          <div class="eco-node"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="eco-node" style="bottom:-23px;top:auto;left:50%;margin-left:-23px"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg></div>
+          <div class="eco-node" style="right:-23px;left:auto;top:50%;margin-top:-23px"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+          <div class="eco-node"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social-proof">
+    <div class="section-tag rv">Dipercaya Oleh</div>
+    <div class="logo-strip">
+      <div class="logo-track">
+        <span class="logo-item">Synchronize Fest</span><span class="logo-item">Spotify Indonesia</span><span class="logo-item">Bank BRI Jogja</span><span class="logo-item">Unilever ID</span><span class="logo-item">GoTo Group</span><span class="logo-item">Jogja Kreatif</span><span class="logo-item">Tokopedia</span><span class="logo-item">UGM Events</span>
+        <span class="logo-item">Synchronize Fest</span><span class="logo-item">Spotify Indonesia</span><span class="logo-item">Bank BRI Jogja</span><span class="logo-item">Unilever ID</span><span class="logo-item">GoTo Group</span><span class="logo-item">Jogja Kreatif</span><span class="logo-item">Tokopedia</span><span class="logo-item">UGM Events</span>
+      </div>
+    </div>
+    <div class="testimonials">
+      <div class="testi rv"><div class="testi-q">"</div><p class="testi-text">"SANS Creative menangani festival kami dari awal sampai akhir dengan luar biasa. Gate, stage, crowd—semuanya tepat waktu dan energinya gila."</p><div class="testi-author"><div class="testi-av" style="background:linear-gradient(135deg,#8b0000,#eb0303)">AR</div><div><div class="testi-name">Andi Rahman</div><div class="testi-role">Festival Director, Synchronize Fest</div></div></div></div>
+      <div class="testi rv" style="transition-delay:.1s"><div class="testi-q">"</div><p class="testi-text">"Tuktix — platform ticketing dari SANS — memberi kami data real-time setiap gate. Tidak akan pernah kembali ke check-in manual."</p><div class="testi-author"><div class="testi-av" style="background:linear-gradient(135deg,#003a80,#1460eb)">DS</div><div><div class="testi-name">Dewi Sartika</div><div class="testi-role">Brand Activation Lead, Unilever ID</div></div></div></div>
+      <div class="testi rv" style="transition-delay:.2s"><div class="testi-q">"</div><p class="testi-text">"Dari izin venue sampai booking talent sampai equipment—satu telepon, satu tim SANS. EO paling lengkap yang pernah kami gunakan."</p><div class="testi-author"><div class="testi-av" style="background:linear-gradient(135deg,#1a4a10,#2d6b3a)">BW</div><div><div class="testi-name">Budi Wahyono</div><div class="testi-role">Event Manager, Bank BRI Jogja</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE CTA -->
+  <section class="marquee-cta">
+    <div class="mq-strip"><div class="mq-inner">
+      <div class="mq-item"><span class="mq-dot"></span>GET YOUR EVENT READY</div><div class="mq-item"><span class="mq-dot"></span>TUKTIX POWERED</div><div class="mq-item"><span class="mq-dot"></span>PRODUCTION READY</div><div class="mq-item"><span class="mq-dot"></span>END-TO-END ECOSYSTEM</div><div class="mq-item"><span class="mq-dot"></span>SANS CREATIVE JOGJAKARTA</div>
+      <div class="mq-item"><span class="mq-dot"></span>GET YOUR EVENT READY</div><div class="mq-item"><span class="mq-dot"></span>TUKTIX POWERED</div><div class="mq-item"><span class="mq-dot"></span>PRODUCTION READY</div><div class="mq-item"><span class="mq-dot"></span>END-TO-END ECOSYSTEM</div><div class="mq-item"><span class="mq-dot"></span>SANS CREATIVE JOGJAKARTA</div>
+    </div></div>
+    <div class="mq-center rv">
+      <h2 class="mq-title">Siap bangun sesuatu yang <em>tak terlupakan?</em></h2>
+      <a class="btn btn-primary" onclick="openModal('Talk to SANS Team','','','')">Talk to SANS Team ↗</a>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════ PAGE: ABOUT ══════════════ -->
+<div class="page" id="page-about">
+  <div class="mini-hero">
+    <div class="mini-hero-num">ABOUT</div>
+    <div class="section-tag rv">Who We Are</div>
+    <h1 class="section-title rv">Operator.<br>Kreatif.<br><em>Satu Tim.</em></h1>
+    <p class="section-sub rv">Lahir dari cinta musik, SANS Creative tumbuh menjadi perusahaan event paling lengkap di Jogjakarta—memadukan visi kreatif dengan presisi operasional.</p>
+  </div>
+  <div class="about-grid">
+    <div>
+      <div class="section-tag rv">Our Story</div>
+      <h2 class="section-title rv">Siapa <em>SANS</em></h2>
+      <p class="section-sub rv">SANS Creative adalah induk dari seluruh ekosistem bisnis event kami—mulai dari Tuktix (platform ticketing), persewaan alat, pembiayaan, hingga manajemen bakat. Semua dibangun dari bawah, di Jogjakarta.</p>
+      <div class="rv" style="margin-top:36px;display:flex;gap:14px">
+        <a class="btn btn-primary" onclick="showPage('service')">Layanan Kami ↗</a>
+        <a class="btn btn-outline" onclick="showPage('event')">Lihat Events</a>
+      </div>
+    </div>
+    <div class="about-visual-wrap rv-r">
+      <div class="about-img-a"><div class="about-placeholder" style="flex-direction:column;gap:8px;text-align:center"><svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:rgba(235,3,3,.2)"><path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-3c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg>The SANS Team</div></div>
+      <div class="about-img-b"><div class="about-placeholder" style="flex-direction:column;gap:6px;text-align:center"><svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:rgba(235,3,3,.15)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Jogjakarta</div></div>
+      <div class="about-img-line"></div>
+    </div>
+  </div>
+
+  <section class="timeline-section">
+    <div class="section-tag rv">Timeline</div>
+    <h2 class="section-title rv">Perjalanan <em>Kami</em></h2>
+    <div class="timeline rv">
+      <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M9 19V6l12-3v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg></div><div class="tl-year">2018 — Awal Mula</div><div class="tl-title">Start with Music</div><div class="tl-desc">SANS Creative dimulai sebagai promotor musik kecil yang menjalankan indie shows di Jogjakarta. Tiga orang, satu sistem PA pinjaman, dan passion besar untuk menggerakkan crowd.</div></div>
+      <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="tl-year">2020 — Fase Pertumbuhan</div><div class="tl-title">Scale to All Events</div><div class="tl-desc">Reputasi berkembang, SANS meluas ke corporate events, brand activations, dan community shows. Sistem operasional kami menjadi backbone yang dipercaya klien.</div></div>
+      <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="tl-year">2022 — Ekosistem Dibangun</div><div class="tl-title">Bangun Ekosistem SANS</div><div class="tl-desc">Kami membangun Tuktix—platform ticketing proprietary milik SANS—dan mengintegrasikan equipment rental, financing, dan talent management ke dalam satu ekosistem koordinasi tunggal.</div></div>
+      <div class="tl-item"><div class="tl-dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><div class="tl-year">2024 — Sekarang</div><div class="tl-title">Event Partner Terlengkap di Jogjakarta</div><div class="tl-desc">200+ events diproduksi, 50.000+ penonton dijangkau, dan tim spesialis yang terus berkembang—menjadikan setiap event operasional sempurna dan kreatif berkesan.</div></div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <div class="section-tag rv">Values</div>
+    <h2 class="section-title rv">Yang Mendorong <em>Kami</em></h2>
+    <div class="values-grid">
+      <div class="val-card rv"><div class="val-bg">01</div><div class="val-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="val-title">Safety & Compliance</div><div class="val-desc">Setiap event dimulai dengan perencanaan keselamatan. Izin, crowd management, medical standby, dan prosedur darurat adalah hal non-negosiasi—bukan afterthought.</div></div>
+      <div class="val-card rv" style="transition-delay:.1s"><div class="val-bg">02</div><div class="val-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="val-title">Audience Experience</div><div class="val-desc">Audiens adalah eventnya. Setiap keputusan—dari desain antrian hingga penempatan suara—dibuat dengan pengalaman crowd sebagai bintang utama.</div></div>
+      <div class="val-card rv" style="transition-delay:.2s"><div class="val-bg">03</div><div class="val-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="val-title">Data-Driven Ops</div><div class="val-desc">Intuisi tidak menjalankan event. Sistem kami melacak tingkat masuk gate, waktu respons vendor, dan kepadatan crowd secara real-time untuk keputusan yang tepat.</div></div>
+      <div class="val-card rv" style="transition-delay:.3s"><div class="val-bg">04</div><div class="val-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><div class="val-title">Creative Direction</div><div class="val-desc">Kami tidak hanya produksi event—kami mendesain pengalaman. Stage design, kurasi artis, narasi brand, dan atmosfer dibentuk dengan visi kreatif yang terarah.</div></div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <div class="section-tag rv">The People</div>
+    <h2 class="section-title rv">Tim <em>SANS</em></h2>
+    <div class="team-grid">
+      <div class="team-card rv"><div class="team-av" style="background:linear-gradient(135deg,#8b0000,#eb0303)">RH</div><div class="team-name">Reza Hartanto</div><div class="team-role">Creative Director</div><div class="team-bio">Membentuk visi kreatif di balik setiap event SANS. 8 tahun di kurasi musik dan experiential design.</div></div>
+      <div class="team-card rv" style="transition-delay:.08s"><div class="team-av" style="background:linear-gradient(135deg,#1a5c2a,#2d6b3a)">MP</div><div class="team-name">Maya Putri</div><div class="team-role">Event Producer</div><div class="team-bio">Memimpin produksi end-to-end dari brief hingga breakdown. Master rundown dan resolusi krisis on-site.</div></div>
+      <div class="team-card rv" style="transition-delay:.16s"><div class="team-av" style="background:linear-gradient(135deg,#0a2a4a,#1460eb)">AF</div><div class="team-name">Aldi Firmansyah</div><div class="team-role">Tech & System Lead</div><div class="team-bio">Membangun Tuktix dari nol. Mengawasi semua infrastruktur digital, live dashboard, dan sistem gate QR.</div></div>
+      <div class="team-card rv" style="transition-delay:.24s"><div class="team-av" style="background:linear-gradient(135deg,#3a1a06,#7a3010)">YS</div><div class="team-name">Yusuf Santoso</div><div class="team-role">Operation Lead</div><div class="team-bio">Memimpin operasi lapangan di semua venue. Setiap crew, vendor, setiap checkpoint adalah domainnya.</div></div>
+      <div class="team-card rv" style="transition-delay:.32s"><div class="team-av" style="background:linear-gradient(135deg,#3a0a1a,#7a1040)">NN</div><div class="team-name">Nadia Noviani</div><div class="team-role">Partnership Lead</div><div class="team-bio">Membangun dan memelihara hubungan dengan sponsor, brand, artis, dan operator venue seluruh Jogjakarta.</div></div>
+      <div class="team-card rv" style="transition-delay:.4s"><div class="team-av" style="background:linear-gradient(135deg,#0a2a2a,#104040)">BK</div><div class="team-name">Bayu Kurniawan</div><div class="team-role">Finance & Procurement</div><div class="team-bio">Mengelola event financing, penjadwalan pembayaran vendor, dan pengadaan seluruh peralatan teknis.</div></div>
+    </div>
+  </section>
+
+  <div class="about-cta">
+    <div class="section-tag rv" style="justify-content:center">Kolaborasi</div>
+    <h3 class="rv">Partner dengan SANS Creative</h3>
+    <p class="rv">Mari ciptakan sesuatu yang luar biasa bersama. Ceritakan event Anda dan kami akan membangun sisanya.</p>
+    <a class="btn btn-primary rv" onclick="openModal('Partner dengan SANS Creative','','','')">Mulai Planning ↗</a>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: EVENT ══════════════ -->
+<div class="page" id="page-event">
+  <div class="mini-hero">
+    <div class="mini-hero-num">EVENTS</div>
+    <div class="section-tag rv">SANS Events</div>
+    <h1 class="section-title rv">Discover <em>Events</em></h1>
+    <p class="section-sub rv">Dari intimate indie night hingga festival besar—temukan pengalaman berikutnya di Jogjakarta dan sekitarnya.</p>
+  </div>
+  <div class="event-filter-bar">
+    <div class="filter-grp"><label class="filter-lbl">Kategori</label><select class="filter-select"><option>Semua</option><option>Festival</option><option>Indie Night</option><option>EDM</option><option>Corporate</option><option>Community</option><option>Jazz</option></select></div>
+    <div class="filter-grp"><label class="filter-lbl">Kota</label><select class="filter-select"><option>Semua Kota</option><option>Jogjakarta</option><option>Bandung</option><option>Jakarta</option><option>Bali</option></select></div>
+    <div class="filter-grp"><label class="filter-lbl">Bulan</label><select class="filter-select"><option>Semua Bulan</option><option>Agustus</option><option>September</option><option>Oktober</option><option>November</option><option>Desember</option></select></div>
+    <div class="filter-grp" style="flex:2"><label class="filter-lbl">Cari Event</label><input type="text" class="filter-input" placeholder="Cari nama event..."></div>
+    <button class="filter-btn">Cari</button>
+  </div>
+  <section class="listing-section">
+    <div class="listing-grid" id="listing-grid">
+      <!-- Cards generated by JS with real image URLs -->
+    </div>
+    <div style="text-align:center;padding:32px 0 0"><button class="btn btn-outline" id="loadmore-btn" onclick="this.textContent='Memuat...'">Load More Events</button></div>
+  </section>
+  <section class="flow-section">
+    <div class="section-tag rv">Powered by Tuktix</div>
+    <h2 class="section-title rv">Sistem Tiket <em>SANS</em></h2>
+    <div class="flow-steps">
+      <div class="flow-step rv"><div class="flow-num">01</div><div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div class="flow-title">Publish Event & Setup Tiket</div><div class="flow-desc">Setup halaman event, tier tiket, harga, dan akses promoter di dashboard Tuktix. QR code digenerate otomatis.</div><div class="flow-arrow"></div></div>
+      <div class="flow-step rv" style="transition-delay:.15s"><div class="flow-num">02</div><div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="flow-title">Jual & Monitor Dashboard</div><div class="flow-desc">Pantau penjualan real-time, gate entry, dan revenue. Bagikan data live dengan tim dan sesuaikan harga dinamis.</div><div class="flow-arrow"></div></div>
+      <div class="flow-step rv" style="transition-delay:.3s"><div class="flow-num">03</div><div class="flow-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg></div><div class="flow-title">Check-In & Laporan</div><div class="flow-desc">Scanner gate memproses QR ticket instan. Laporan post-event mencakup tingkat masuk, peak times, dan breakdown revenue.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════ PAGE: SERVICE ══════════════ -->
+<div class="page" id="page-service">
+  <div class="mini-hero">
+    <div class="mini-hero-num">SERVICE</div>
+    <div class="section-tag rv">Layanan SANS</div>
+    <h1 class="section-title rv">Services</h1>
+    <p class="section-sub rv">Semua yang Anda butuhkan untuk menjalankan event—dalam satu ekosistem yang dikelola SANS Creative.</p>
+  </div>
+  <section class="svc-blocks">
+    <div class="svc-block">
+      <div class="svc-content rv-l">
+        <div class="svc-tag-line">01 — Platform Ticketing</div>
+        <h2 class="svc-title">Tuktix — Platform Ticketing Online SANS</h2>
+        <p class="svc-desc">Backbone dari setiap event SANS. Tuktix adalah platform ticketing yang dibangun dan dimiliki SANS Creative, memberikan kontrol real-time atas setiap tiket, setiap gate scan, dan setiap rupiah yang masuk.</p>
+        <div class="svc-feats">
+          <div class="svc-feat">Generasi & scanning QR ticket</div>
+          <div class="svc-feat">Dashboard penjualan real-time</div>
+          <div class="svc-feat">Gate scan dengan offline mode</div>
+          <div class="svc-feat">Akses promoter & reseller</div>
+          <div class="svc-feat">Laporan revenue post-event</div>
+          <div class="svc-feat">Multi-tier pricing & early bird</div>
+        </div>
+        <a class="btn btn-primary" onclick="openModal('Request Demo Tuktix','','','DEMO')">Request Demo ↗</a>
+      </div>
+      <div class="svc-vis vis-tix rv-r">
+        <div class="qr-box"><div class="qr-scan"></div><div class="qr-c1"></div><div class="qr-c2"></div><div class="qr-c3"></div><div class="qr-c4"></div>
+          <div class="qr-grid">
+            <div class="qr-cell" style="--op:.8"></div><div class="qr-cell" style="--op:.2"></div><div class="qr-cell" style="--op:.9"></div><div class="qr-cell" style="--op:.3"></div><div class="qr-cell" style="--op:.7"></div>
+            <div class="qr-cell" style="--op:.4"></div><div class="qr-cell" style="--op:.85"></div><div class="qr-cell" style="--op:.15"></div><div class="qr-cell" style="--op:.6"></div><div class="qr-cell" style="--op:.5"></div>
+            <div class="qr-cell" style="--op:.7"></div><div class="qr-cell" style="--op:.3"></div><div class="qr-cell" style="--op:.95"></div><div class="qr-cell" style="--op:.45"></div><div class="qr-cell" style="--op:.8"></div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:32px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--accent)">TUKTIX ✓ VALID</div>
+      </div>
+    </div>
+    <div class="svc-block">
+      <div class="svc-content rv-r">
+        <div class="svc-tag-line">02 — Manajemen Event</div>
+        <h2 class="svc-title">Event System Management</h2>
+        <p class="svc-desc">Dari pra-produksi hingga wrap post-event, sistem manajemen kami menjaga setiap crew, vendor, dan timeline tetap tersinkronisasi.</p>
+        <div class="svc-feats">
+          <div class="svc-feat">Penugasan & briefing crew roles</div>
+          <div class="svc-feat">Live rundown tracking</div>
+          <div class="svc-feat">Daftar koordinasi vendor</div>
+          <div class="svc-feat">Incident log & eskalasi</div>
+          <div class="svc-feat">Manajemen inventori</div>
+          <div class="svc-feat">Laporan lengkap post-event</div>
+        </div>
+        <a class="btn btn-outline">Pelajari Lebih →</a>
+      </div>
+      <div class="svc-vis vis-sys rv-l">
+        <div class="rundown-rows">
+          <div class="rd-row"><div class="rd-dot" style="background:#2d6b3a"></div><div class="rd-time">14:00 WIB</div><div class="rd-label">Gate Open</div><div class="rd-status" style="color:#5aad6a">SELESAI</div></div>
+          <div class="rd-row"><div class="rd-dot" style="background:var(--accent);animation:pulse2 2s infinite"></div><div class="rd-time">15:30 WIB</div><div class="rd-label">Soundcheck Utama</div><div class="rd-status" style="color:var(--accent)">LIVE</div></div>
+          <div class="rd-row"><div class="rd-dot" style="background:var(--border)"></div><div class="rd-time">17:00 WIB</div><div class="rd-label">Artis Opening</div><div class="rd-status" style="color:var(--gray)">NEXT</div></div>
+          <div class="rd-row"><div class="rd-dot" style="background:var(--border)"></div><div class="rd-time">20:00 WIB</div><div class="rd-label">Headliner Performance</div><div class="rd-status" style="color:var(--gray)">—</div></div>
+          <div class="rd-row"><div class="rd-dot" style="background:var(--border)"></div><div class="rd-time">22:30 WIB</div><div class="rd-label">Event Close & Wrap</div><div class="rd-status" style="color:var(--gray)">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="svc-block">
+      <div class="svc-content rv-l">
+        <div class="svc-tag-line">03 — Persewaan Alat</div>
+        <h2 class="svc-title">Persewaan Alat Event</h2>
+        <p class="svc-desc">Equipment event lengkap dari gudang kami sendiri. Tidak ada kejutan vendor pihak ketiga—gear kami dirawat, diuji, dan dikirim oleh tim kami sendiri.</p>
+        <div class="svc-feats">
+          <div class="svc-feat">Line arrays & sistem PA</div>
+          <div class="svc-feat">Stage & struktur truss</div>
+          <div class="svc-feat">LED video wall & screen</div>
+          <div class="svc-feat">Lighting rig & followspot</div>
+          <div class="svc-feat">Wristband, lanyard & barrier</div>
+          <div class="svc-feat">Scanner & access control</div>
+        </div>
+        <a class="btn btn-primary" onclick="openModal('Custom Quote Equipment','','','QUOTE')">Custom Quote ↗</a>
+      </div>
+      <div class="svc-vis vis-rent rv-r">
+        <div class="equip-grid">
+          <div class="equip-item"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 19c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2z"/></svg><div class="equip-lbl">Audio</div></div>
+          <div class="equip-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg><div class="equip-lbl">Lighting</div></div>
+          <div class="equip-item"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div class="equip-lbl">LED Wall</div></div>
+          <div class="equip-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div class="equip-lbl">Stage</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="svc-block">
+      <div class="svc-content rv-r">
+        <div class="svc-tag-line">04 — Pembiayaan Event</div>
+        <h2 class="svc-title">Pembiayaan Event</h2>
+        <p class="svc-desc">Event luar biasa tidak boleh terhenti karena cashflow. Pembiayaan kami menjembatani gap antara visi Anda dan realitas anggaran.</p>
+        <div class="svc-feats">
+          <div class="svc-feat">Pembiayaan bertahap per milestone</div>
+          <div class="svc-feat">Cashflow bridge untuk biaya event</div>
+          <div class="svc-feat">Penjadwalan pembayaran vendor</div>
+          <div class="svc-feat">Repayment berbasis revenue</div>
+          <div class="svc-feat">Subject to assessment & approval</div>
+        </div>
+        <a class="btn btn-outline">Pelajari Lebih →</a>
+      </div>
+      <div class="svc-vis vis-fin rv-l">
+        <div class="fin-display">
+          <div class="fin-label">CASHFLOW BRIDGE COVERAGE</div>
+          <div class="fin-bar-wrap"><div class="fin-bar-fill"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-family:'Syne',sans-serif;font-size:11px;color:var(--gray)">Event Budget</span><span style="font-family:'Syne',sans-serif;font-size:11px;color:var(--accent)">70% Covered</span></div>
+          <div style="width:100%;height:1px;background:var(--border);margin:16px 0"></div>
+          <div class="fin-amount">Rp 500jt</div>
+          <div class="fin-note">Bridge financing tersedia — subject to assessment</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="packages-section">
+    <div class="section-tag rv">Pricing</div>
+    <h2 class="section-title rv">Pilih <em>Paket</em> Anda</h2>
+    <div class="pkg-grid">
+      <div class="pkg rv">
+        <div class="pkg-name">Starter</div>
+        <div class="pkg-desc">Ideal untuk community shows dan event kecil hingga 500 pax</div>
+        <div class="pkg-price">Custom<span> / proposal</span></div>
+        <div class="pkg-feats">
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Tuktix ticketing setup</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Paket equipment dasar</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Dukungan rundown event</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>1 production coordinator</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Laporan post-event</div>
+        </div>
+        <a class="btn btn-outline" style="width:100%;justify-content:center" onclick="openModal('Get Proposal — Starter','','','')">Get Proposal</a>
+      </div>
+      <div class="pkg featured rv" style="transition-delay:.1s">
+        <div style="position:absolute;top:14px;right:14px;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:.2em;background:rgba(10,9,9,.25);padding:3px 9px;color:var(--bg)">POPULAR</div>
+        <div class="pkg-name">Pro</div>
+        <div class="pkg-desc">Mid-scale events dan brand activations, 500–3.000 pax</div>
+        <div class="pkg-price">Custom<span> / proposal</span></div>
+        <div class="pkg-feats">
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Full Tuktix integration</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Equipment rental lengkap</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Full crew & management</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Venue & pengurusan izin</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Koordinasi talent</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Akses live dashboard</div>
+        </div>
+        <a class="btn" style="background:var(--bg);color:var(--accent);width:100%;justify-content:center;padding:16px" onclick="openModal('Get Proposal — Pro','','','')">Get Proposal</a>
+      </div>
+      <div class="pkg rv" style="transition-delay:.2s">
+        <div class="pkg-name">Festival</div>
+        <div class="pkg-desc">Festival full-scale dan major events, 3.000+ pax</div>
+        <div class="pkg-price">Custom<span> / proposal</span></div>
+        <div class="pkg-feats">
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Semua yang ada di Pro</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Multi-stage management</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Opsi event financing</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Tim proyek dedicated</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Sponsor management</div>
+          <div class="pkg-feat"><svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>Security & medical standby</div>
+        </div>
+        <a class="btn btn-outline" style="width:100%;justify-content:center" onclick="openModal('Get Proposal — Festival','','','')">Get Proposal</a>
+      </div>
+    </div>
+  </section>
+  <section class="svc-cta">
+    <div class="section-tag rv" style="justify-content:center">Siap?</div>
+    <h2 class="rv">Beritahu tanggal, kota, dan ukuran audiens Anda—<em>SANS akan urus sisanya.</em></h2>
+    <p class="rv">Tidak perlu proposal panjang. Cukup ceritakan visi Anda, kami akan hadir dengan rencana konkret.</p>
+    <div class="rv" style="display:flex;gap:14px;justify-content:center">
+      <a class="btn btn-primary" onclick="openModal('Get a Proposal','','','PROPOSAL')">Get a Proposal ↗</a>
+      <a class="btn btn-outline" onclick="showPage('about')">Meet The Team</a>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════ PAGE: SHOP (BEHINDTHESANS) ══════════════ -->
+<div class="page" id="page-shop">
+  <div class="mini-hero" style="background:var(--surface)">
+    <div class="mini-hero-num">SHOP</div>
+    <div class="section-tag rv">SANS Merchandise</div>
+    <h1 class="shop-big-title rv">BEHIND<br>THE<br><em>SANS</em></h1>
+    <p class="section-sub rv" style="margin-top:20px">Wear the culture. Setiap piece dirancang untuk mereka yang hidup di dalam event—crew, artis, dan crowd yang selalu hadir.</p>
+    <div class="rv" style="margin-top:36px;display:flex;gap:14px">
+      <a class="btn btn-primary" onclick="document.getElementById('shop-items').scrollIntoView({behavior:'smooth'})">Shop Now ↗</a>
+      <a class="btn btn-outline" onclick="showPage('about')">Our Story</a>
+    </div>
+  </div>
+  <section class="shop-intro" id="shop-items">
+    <div class="section-tag rv">New Drops</div>
+    <h2 class="section-title rv">Latest <em>Collection</em></h2>
+    <div class="shop-grid" style="margin-top:48px">
+      <div class="sc rv"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#1a0a0a,#2a1010)"><div class="sc-ico"><svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.86H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.86l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div><div class="sc-bg-txt">OVERSIZED TEE</div></div></div><div class="sc-body"><div class="sc-tag">Apparel · Unisex</div><div class="sc-name">SANS Logo Oversized Tee</div><div class="sc-bot"><span class="sc-price">Rp 185.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+      <div class="sc rv" style="transition-delay:.08s"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#0a0a1a,#101028)"><div class="sc-ico"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5zm0 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4z"/></svg></div><div class="sc-bg-txt">SNAPBACK</div></div></div><div class="sc-body"><div class="sc-tag">Accessories</div><div class="sc-name">Crew Snapback Cap</div><div class="sc-bot"><span class="sc-price">Rp 145.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+      <div class="sc rv" style="transition-delay:.16s"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#1a0a14,#2a1020)"><div class="sc-ico"><svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.86H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.86l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div><div class="sc-bg-txt">HOODIE</div></div></div><div class="sc-body"><div class="sc-tag">Apparel · Unisex</div><div class="sc-name">Behind The SANS Hoodie</div><div class="sc-bot"><span class="sc-price">Rp 325.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+      <div class="sc rv"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#1a1208,#2a1e0a)"><div class="sc-ico"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="sc-bg-txt">WRISTBAND</div></div></div><div class="sc-body"><div class="sc-tag">Collectibles</div><div class="sc-name">Event Wristband Pack — Vintage Series</div><div class="sc-bot"><span class="sc-price">Rp 75.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+      <div class="sc rv" style="transition-delay:.08s"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#0a1208,#101e0c)"><div class="sc-ico"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div><div class="sc-bg-txt">TOTE BAG</div></div></div><div class="sc-body"><div class="sc-tag">Accessories</div><div class="sc-name">SANS Event Tote Bag — Canvas</div><div class="sc-bot"><span class="sc-price">Rp 95.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+      <div class="sc rv" style="transition-delay:.16s"><div class="sc-img"><div class="sc-img-bg" style="background:linear-gradient(135deg,#181008,#261808)"><div class="sc-ico"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><div class="sc-bg-txt">STICKER PACK</div></div></div><div class="sc-body"><div class="sc-tag">Collectibles</div><div class="sc-name">SANS x Tuktix Sticker Pack</div><div class="sc-bot"><span class="sc-price">Rp 45.000</span><button class="sc-add" onclick="addCart(this)">ADD TO CART</button></div></div></div>
+    </div>
+  </section>
+  <section class="brand-story">
+    <div class="brand-grid">
+      <div class="rv-l"><div class="section-tag">The Story</div><blockquote class="brand-quote">"Di balik setiap event luar biasa ada tim yang hidup untuk momen ketika semuanya menjadi nyata."</blockquote></div>
+      <div class="brand-txt rv-r"><p>Behind The SANS bukan sekadar merch—ini adalah lencana bagi siapa saja yang pernah berada di sisi lain panggung. Crew yang setup jam 6 pagi. Artis yang soundcheck di gedung kosong. Penonton yang selalu hadir.</p><p>Setiap piece dirancang untuk membawa energi itu. Run terbatas, material berkualitas, dan desain yang bermakna bagi mereka yang mengerti apa yang dibutuhkan untuk membangun sebuah momen.</p><p>Kami kirim ke seluruh Indonesia. Setiap order mendanai equipment untuk artis emerging dan event komunitas di Jogjakarta.</p><div style="margin-top:28px"><a class="btn btn-primary">Shop All Items ↗</a></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3170.71 818.36" height="26" style="fill:#f5f0eb;display:block;margin-bottom:14px"><path d="M874.51 654.98c-33.09,0 -60.06,26.97 -60.06,60.06l0 43.26c0,33.16 26.97,60.06 60.06,60.06 33.16,0 60.06,-26.9 60.06,-60.06l0 -2.51 -23.95 0 0 2.51c0,19.9 -16.21,36.11 -36.11,36.11 -19.9,0 -36.11,-16.21 -36.11,-36.11l0 -43.26c0,-19.9 16.21,-36.04 36.11,-36.04 19.9,0 36.11,16.14 36.11,36.04l0 2.36 23.95 0 0 -2.36c0,-33.09 -26.9,-60.06 -60.06,-60.06zm253.43 106.78c3.09,-2.06 5.9,-4.42 8.55,-6.85 9.51,-9.66 15.4,-22.92 15.4,-37.51l0 -9.66c0,-0.15 0,-0.29 0,-0.59 -0.15,-12.01 -3.54,-23.07 -9.51,-31.76 -1.18,-1.69 -2.43,-3.39 -3.83,-5.01 -2.21,-2.58 -4.72,-4.79 -7.37,-6.78 -1.03,-0.96 -2.14,-1.62 -3.24,-2.36 -6.56,-4.05 -13.85,-6.26 -21.59,-6.26l-74.5 0 0 163.38 23.95 0 0 -48.05 36.55 0 33.9 48.05 29.4 0 -36.55 -51.96c3.09,-1.25 6.04,-2.8 8.84,-4.64zm-28.74 -15.4l-43.4 0 0 -67.36 43.4 0c7.89,0 15.04,3.24 20.34,8.4 5.16,5.23 8.4,12.38 8.4,20.34l0 9.66c0,7.96 -3.24,15.25 -8.4,20.41 -4.05,3.98 -9.14,6.78 -15.11,7.89 -1.69,0.29 -3.54,0.66 -5.23,0.66zm156.82 72l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38zm270.97 -163.38c-33.09,0 -59.99,26.97 -59.99,60.06l0 103.32 23.95 0 0 -43.26 72.15 0 0 43.26 23.95 0 0 -43.26 0 -24.1 0 -35.96c0,-33.09 -26.9,-60.06 -60.06,-60.06zm36.11 96.02l-72.15 0 0 -35.96c0,-19.9 16.14,-36.04 36.04,-36.04 9.95,0 19.01,3.98 25.57,10.54 6.48,6.56 10.54,15.55 10.54,25.5l0 35.96zm194.84 -96.02l-72.07 0 0 24.02 48.12 0 0 139.35 23.95 0 0 -139.35 48.05 0 0 -24.02 -48.05 0zm146.94 163.38l23.95 0 0 -163.38 -23.95 0 0 163.38zm182.32 -31.25l-39.2 -132.13 -25.05 0 48.41 163.38 31.54 0 48.56 -163.38 -25.2 0 -39.06 132.13zm158.44 31.25l110.54 0 0 -23.95 -86.59 0 0 -43.41 67.36 0 0 -23.95 -67.36 0 0 -48.05 86.59 0 0 -24.02 -110.54 0 0 163.38z"/><path d="M2581.68 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.27,61.02 61.02,61.02l417.4 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.93,171.48 -171.63,171.48l-588.96 0 0 -110.47 588.96 0c33.67,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.4 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm-2410.12 0l589.03 0 0 110.54 -589.03 0c-33.68,0 -61.02,27.34 -61.02,61.02 0,33.75 27.26,61.02 61.02,61.02l417.39 0c94.77,0 171.63,76.86 171.63,171.63 0,94.7 -76.94,171.48 -171.63,171.48l-588.95 0 0 -110.47 588.95 0c33.68,0 61.02,-27.34 61.02,-61.02 0,-33.75 -27.27,-61.02 -61.02,-61.02l-417.39 0c-94.7,0 -171.56,-76.93 -171.56,-171.63 0,-94.7 76.86,-171.56 171.56,-171.56zm1227.13 110.54l-31.47 0c-20.27,0 -39.43,7.37 -54.02,20.12l-444.88 445.03 -156.3 0 525.58 -525.65c35.96,-32.5 81.8,-50.04 129.62,-50.04l142.08 0 0 575.69 -110.61 0 0 -465.15zm314.82 43.48l0 421.67 -110.47 0 0 -575.69 93.51 0 532.21 421.67 0 -421.67 110.54 0 0 575.69 -93.59 0 -532.21 -421.67z"/></svg>
+      <p class="ft-tagline">Ekosistem event paling lengkap di Jogjakarta. SANS Creative — induk dari Tuktix, persewaan alat, pembiayaan, dan lebih.</p>
+      <div class="ft-socials">
+        <a class="ft-soc" href="#"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a class="ft-soc" href="#"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+        <a class="ft-soc" href="#"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-2-1.94C18.88 4 12 4 12 4s-6.88 0-8.54.46a2.78 2.78 0 0 0-2 1.94A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.46 19.5C5.12 20 12 20 12 20s6.88 0 8.54-.46a2.78 2.78 0 0 0 2-1.92A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75,15.02 15.5,12 9.75,8.98 9.75,15.02"/></svg></a>
+        <a class="ft-soc" href="#"><svg viewBox="0 0 24 24"><path d="M21 2H3v16h5v4l4-4h5l4-4V2zm-10 9V7m4 4V7"/></svg></a>
+      </div>
+    </div>
+    <div><div class="ft-col-title">Halaman</div><ul class="ft-links"><li><a onclick="showPage('home')">Home</a></li><li><a onclick="showPage('about')">About</a></li><li><a onclick="showPage('event')">Events</a></li><li><a onclick="showPage('service')">Services</a></li><li><a onclick="showPage('shop')">Shop</a></li></ul></div>
+    <div><div class="ft-col-title">Layanan</div><ul class="ft-links"><li><a onclick="showPage('service')">Tuktix Ticketing</a></li><li><a onclick="showPage('service')">Event Management</a></li><li><a onclick="showPage('service')">Equipment Rental</a></li><li><a onclick="showPage('service')">Event Financing</a></li><li><a onclick="showPage('service')">Talent & Crew</a></li><li><a onclick="showPage('service')">Venue & Permit</a></li></ul></div>
+    <div><div class="ft-col-title">Kontak</div><ul class="ft-links"><li><a>hello@sanscreative.id</a></li><li><a>+62 812-0000-0000</a></li><li><a>Jogjakarta, Indonesia</a></li><li><a onclick="openModal('Plan an Event','','','')">Plan an Event</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span class="ft-copy">© 2025 SANS Creative — All Rights Reserved · Jogjakarta</span><span class="ft-tagk">Powered by <strong>Tuktix</strong> — Platform Ticketing SANS</span></div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-tag-line" id="m-tag">GET TICKET</div>
+    <div class="modal-title" id="m-title">Event Name</div>
+    <div class="modal-sub" id="m-sub">Date · Venue</div>
+    <input type="text" class="modal-inp" placeholder="Nama lengkap">
+    <input type="email" class="modal-inp" placeholder="Alamat email">
+    <input type="tel" class="modal-inp" placeholder="Nomor WhatsApp">
+    <select class="modal-inp" style="-webkit-appearance:none;cursor:pointer"><option value="">Pilih jenis tiket</option><option>Regular — Rp 150.000</option><option>VIP — Rp 350.000</option><option>VVIP — Rp 750.000</option></select>
+    <div style="margin-top:22px"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitModal(this)">Konfirmasi & Dapatkan Tiket ↗</button></div>
+    <div class="modal-footer-note">Ticketing secured by <strong>Tuktix</strong> — Platform SANS Creative</div>
+  </div>
+</div>
+
+<script>
+// ── CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function animR(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animR)})();
+document.querySelectorAll('a,button,.ev-card,.lc,.sc,.team-card,.testi,.hl-card,.val-card,.pkg,.tl-dot,.eco-node').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'))});
+
+// ── LOADER
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('done'),1800));
+
+// ── NAV SCROLL
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',scrollY>60));
+
+// ── STARS
+(function(){const s=document.getElementById('stars');if(!s)return;for(let i=0;i<60;i++){const el=document.createElement('div');el.className='star';el.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${Math.random()*2+1}px;height:${Math.random()*2+1}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;s.appendChild(el)}})();
+
+// ── PAGE NAVIGATION
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const nl=document.getElementById('nav-'+id);
+  if(nl)nl.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  setTimeout(initReveal,80);
+}
+
+// ── SCROLL REVEAL
+function initReveal(){
+  const els=document.querySelectorAll('.rv,.rv-l,.rv-r');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const d=parseFloat(e.target.style.transitionDelay||0)*1000;
+        setTimeout(()=>e.target.classList.add('up'),d);
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(el=>{if(!el.classList.contains('up'))obs.observe(el)});
+}
+initReveal();
+
+// ── EVENT LISTING (with real Unsplash images for events)
+const eventsData=[
+  {name:'Synchronize Festival 2025',date:'Aug 15, 2025',venue:'JIEXPO Kemayoran, Jogjakarta',cat:'Festival',img:'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80'},
+  {name:'Indie Night Vol. 12',date:'Sep 5, 2025',venue:'Kota Baru Musik, Jogjakarta',cat:'Indie Night',img:'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=600&q=80'},
+  {name:'Electric Ground Jogja',date:'Oct 18, 2025',venue:'GOR Among Rogo, Jogjakarta',cat:'EDM',img:'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&q=80'},
+  {name:'Brand Activation Summit',date:'Nov 3, 2025',venue:'Royal Ambarrukmo Hotel, Jogjakarta',cat:'Corporate',img:'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&q=80'},
+  {name:'SANS Outdoor Fest',date:'Dec 20, 2025',venue:'Pantai Parangtritis, Jogjakarta',cat:'Festival',img:'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=600&q=80'},
+  {name:'Community Sounds #7',date:'Jan 10, 2026',venue:'Lapangan GBK, Jogjakarta',cat:'Community',img:'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80'},
+  {name:'Bandung Jazz Night',date:'Feb 14, 2026',venue:'Braga City Walk, Bandung',cat:'Jazz',img:'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80'},
+  {name:'Bali Beach Festival',date:'Mar 1, 2026',venue:'Seminyak Beach, Bali',cat:'Festival',img:'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&q=80'},
+  {name:'Surabaya Rock Night',date:'Apr 5, 2026',venue:'Tunjungan Plaza, Surabaya',cat:'Rock',img:'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=600&q=80'},
+];
+const badgeMap={Festival:'badge-red',EDM:'badge-red',Rock:'badge-red','Indie Night':'badge-blue',Community:'badge-blue',Jazz:'badge-blue',Corporate:'badge-red'};
+function renderEvents(){
+  const grid=document.getElementById('listing-grid');
+  if(!grid)return;
+  grid.innerHTML=eventsData.map((ev,i)=>`
+  <div class="lc rv" style="transition-delay:${(i%3)*.07}s" onclick="openModal('${ev.name}','${ev.date}','${ev.venue}','${ev.cat}')">
+    <div class="lc-img">
+      <div class="lc-img-inner" style="height:100%;background:#111">
+        <img src="${ev.img}" alt="${ev.name}" style="width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.8)" loading="lazy" onerror="this.style.display='none'">
+        <div class="lc-overlay"></div>
+      </div>
+    </div>
+    <div class="lc-badge-wrap"><span class="lc-tuktix">Ticket by Tuktix</span></div>
+    <div class="lc-body">
+      <div class="lc-date">${ev.date} · ${ev.venue.split(',').pop().trim()}</div>
+      <div class="lc-name">${ev.name}</div>
+      <div class="lc-venue"><svg viewBox="0 0 24 24" style="width:11px;height:11px;fill:var(--gray);flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${ev.venue}</div>
+      <div class="lc-btns">
+        <button class="lc-btn lc-btn-p" onclick="event.stopPropagation();openModal('${ev.name}','${ev.date}','${ev.venue}','${ev.cat}')">Beli Tiket</button>
+        <button class="lc-btn lc-btn-o">Detail Event</button>
+      </div>
+    </div>
+  </div>`).join('');
+  setTimeout(initReveal,50);
+}
+renderEvents();
+
+// ── MODAL
+function openModal(title,date,venue,type){
+  document.getElementById('m-title').textContent=title||'Get in Touch';
+  document.getElementById('m-sub').textContent=(date&&venue)?date+' · '+venue:'Ceritakan event Anda';
+  document.getElementById('m-tag').textContent=type||'CONNECT';
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow=''}
+function submitModal(btn){btn.textContent='✓ Tersubmit!';btn.style.background='#2d6b3a';setTimeout(()=>{closeModal();btn.textContent='Konfirmasi & Dapatkan Tiket ↗';btn.style.background=''},2000)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+// ── SHOP CART
+function addCart(btn){btn.textContent='✓ Added!';btn.classList.add('added');setTimeout(()=>{btn.textContent='ADD TO CART';btn.classList.remove('added')},2000)}
+</script>
+</body>
+</html>
